@@ -25,12 +25,17 @@ __all__ = ['tensor_product', 'cartesian_product',
 def _dict_product(d1, d2):
     return dict((k, (d1.get(k), d2.get(k))) for k in set(d1) | set(d2))
 
+def _multiple_dict_product(*dicts):
+    return {k: tuple(map(lambda x: x.get(k)) for k in reduce(lambda x, y: x | y), dicts}
 
 # Generators for producting graph products
 def _node_product(G, H):
     for u, v in product(G, H):
         yield ((u, v), _dict_product(G.node[u], H.node[v]))
 
+def _multiple_node_product(*graphs):
+    for p in product(graphs):
+        yield(p, _multi_dict_product(p))
 
 def _directed_edges_cross_edges(G, H):
     if not G.is_multigraph() and not H.is_multigraph():
@@ -83,6 +88,9 @@ def _edges_cross_nodes(G, H):
                 else:
                     yield (u, x), (v, x), d
 
+def _multiple_edges_cross_nodes(*graphs):
+    if
+
 
 def _nodes_cross_edges(G, H):
     if H.is_multigraph():
@@ -126,6 +134,19 @@ def _init_product_graph(G, H):
         GH = GH.to_directed()
     return GH
 
+def _init_multiple_product_graph(*graphs):
+    if not all(_.is_directed() for _ in graphs) or not all (_.is_directed() for _ in graphs):
+        raise nx.NetworkXError("Graphs must either be all directed or all",
+                               "all undirected")
+
+    if any(_.is_multigraph() for _ in graphs):
+        return nx.MultiGraph()
+    else:
+        if graphs[0].is_directed():
+            return nx.DiGraph()
+        else:
+            return nx.Graph()
+
 
 def tensor_product(G, H):
     r"""Return the tensor product of G and H.
@@ -142,7 +163,7 @@ def tensor_product(G, H):
     Parameters
     ----------
     G, H: graphs
-     Networkx graphs. 
+     Networkx graphs.
 
     Returns
     -------
@@ -234,6 +255,7 @@ def cartesian_product(G, H):
     GH.add_edges_from(_edges_cross_nodes(G, H))
     GH.add_edges_from(_nodes_cross_edges(G, H))
     GH.name = "Cartesian product(" + G.name + "," + H.name + ")"
+    print("yoyoyoyoyoyoyoyoyoyo")
     return GH
 
 
