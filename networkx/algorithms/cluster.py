@@ -258,7 +258,7 @@ def clustering(G, nodes=None, weight=None):
     return clusterc
 
 
-def transitivity(G):
+def transitivity(G, weight=None):
     r"""Compute graph transitivity, the fraction of all possible triangles
     present in G.
 
@@ -269,11 +269,16 @@ def transitivity(G):
 
     .. math::
 
-        T = 3\frac{\#triangles}{\#triads}.
+        T = 3\frac{\#triangles}{\#triads}.\\
+        T_{weighted} = \frac{\sum\limits_{i,j,h\in G}(w_{ij}w_{ih}w_{jh})^{\frac{1}{3}}}{\#triads}.
 
     Parameters
     ----------
     G : graph
+
+    weight : string or None, optional (default=None)
+       The edge attribute that holds the numerical value used as a weight.
+       If None, then each edge has weight 1.
 
     Returns
     -------
@@ -286,8 +291,11 @@ def transitivity(G):
     >>> print(nx.transitivity(G))
     1.0
     """
-    triangles = sum(t for v, d, t, _ in _triangles_and_degree_iter(G))
-    contri = sum(d * (d - 1) for v, d, t, _ in _triangles_and_degree_iter(G))
+    contri = sum(d*(d-1) for v, d, t, _ in _triangles_and_degree_iter(G))
+    if weight is not None:
+        triangles = sum(t for v, d, t in _weighted_triangles_and_degree_iter(G, weight=weight))
+    else:
+        triangles = sum(t for v, d, t, _ in _triangles_and_degree_iter(G))
     return 0 if triangles == 0 else triangles / contri
 
 
