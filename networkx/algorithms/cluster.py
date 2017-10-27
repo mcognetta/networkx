@@ -290,6 +290,13 @@ def transitivity(G, weight=None):
     >>> G = nx.complete_graph(5)
     >>> print(nx.transitivity(G))
     1.0
+    
+    References
+    ----------
+    .. [1] Rubinov, Mikail & Sporns, Olaf. (2009). Rubinov M, Sporns O. 
+       Complex network measures of brain connectivity: uses and interpretations. 
+       NeuroImage 52: 1059-1069. NeuroImage. 52. 1059-69.
+       http://www.sciencedirect.com/science/article/pii/S105381190901074X
     """
     contri = sum(d*(d-1) for v, d, t, _ in _triangles_and_degree_iter(G))
     if weight is not None:
